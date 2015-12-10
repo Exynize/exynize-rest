@@ -4,7 +4,8 @@
   "description": "Exynize REST server, part of Exynize platform",
   "main": "index.js",
   "scripts": {
-    "start": "npm run db-start && nodemon --ignore src/static index.js",
+    "start": "npm run db-start && npm run server",
+    "server": "nodemon --ignore src/static index.js",
     "postinstall": "babel-node setup.js",
     "db-start": "docker run -d -p 28015:28015 -p 8080:8080 --name rethinkpipes rethinkdb",
     "db-stop": "docker stop rethinkpipes"

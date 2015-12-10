@@ -38,7 +38,7 @@ Alternatively you can use docker environment provided with a supplied Dockerfile
 3. Execute `npm start` (this will also start a docker container with RethinkDB)
 4. Exynize REST will start working on `http://localhost:8080`
 
-If you have local RethinkDB instance, you can just use `node index.js` in step 3.
+If you have local RethinkDB instance, you can just use `npm run server` in step 3.
 
 Alternatively, you can use Dockerfile to assemble docker container and then start it with a link to your RethinkDB instance.
 
