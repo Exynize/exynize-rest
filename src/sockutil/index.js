@@ -1,0 +1,1 @@
+export {authedSocket} from './authedSocket';

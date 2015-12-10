@@ -1,0 +1,13 @@
+export const auth = {
+    salt: 'your-auth-salt-here',
+};
+export const db = {
+    host: process.env.NODE_ENV === 'production' ? 'rdb' : 'docker.dev',
+    database: 'exynizedb',
+    user: '',
+    password: '',
+};
+
+export const jwtconf = {
+    secret: 'your-jwt-secret-here',
+};

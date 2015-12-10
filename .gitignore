@@ -1,0 +1,11 @@
+# node modules
+node_modules/
+
+# compiled client-side components
+src/static/
+
+# logs
+*.log
+
+# user config
+config.js
