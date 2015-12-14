@@ -1,6 +1,8 @@
 import logger from '../logger';
 import {rdb} from './connection';
 
+const withoutFields = ['password', 'passwordReset', 'verifyId'];
+
 const table = async function() {
     const {db, connection} = await rdb();
     const t = db.table('users');
@@ -9,7 +11,10 @@ const table = async function() {
 
 const find = async function(pattern) {
     const {t, connection} = await table();
-    const cursor = await t.filter(pattern).without('password').limit(1).run(connection);
+    const cursor = await t.filter(pattern)
+        .without(withoutFields)
+        .limit(1)
+        .run(connection);
     let result;
     try {
         result = await cursor.next();
@@ -27,7 +32,9 @@ const find = async function(pattern) {
 
 const findAll = async function(pattern) {
     const {t, connection} = await table();
-    const cursor = await t.filter(pattern).without('password').run(connection);
+    const cursor = await t.filter(pattern)
+        .without(withoutFields)
+        .run(connection);
     let result;
     try {
         result = await cursor.toArray();
