@@ -12,7 +12,7 @@ const handler = async (req, res) => {
         isEmailValid,
     });
     logger.debug('user updated!');
-    res.status(204);
+    res.sendStatus(204);
 };
 
 export default asyncRequest.bind(null, handler);
