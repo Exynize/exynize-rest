@@ -8,6 +8,16 @@ export const db = {
     password: '',
 };
 
+export const email = {
+    host: 'mail.domain.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: 'user@domain.com',
+        pass: 'pass'
+    },
+};
+
 export const jwtconf = {
     secret: 'your-jwt-secret-here',
 };

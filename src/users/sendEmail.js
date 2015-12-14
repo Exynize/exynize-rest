@@ -1,16 +1,9 @@
 import nodemailer from 'nodemailer';
 import logger from '../logger';
+import {email} from '../../config';
 
 // create transporter
-const transporter = nodemailer.createTransport({
-    host: 'mail.gandi.net',
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'bot@exynize.com',
-        pass: 'eAwNm1lA7VSCla62'
-    }
-});
+const transporter = nodemailer.createTransport(email);
 
 // export send function
 export default ({to, subject, text, html}) => new Promise((resolve, reject) => {
