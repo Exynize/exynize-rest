@@ -1,12 +1,14 @@
+# License
+
 Exynize REST, including all of its components and all of its derivates, is available under different licensing options designed to accommodate the needs of various users.
 
-- Community license (LGPL-3.0)
+## Community license (LGPL-3.0)
 
 Exynize REST licensed under the GNU Lesser General Public License v3 (LGPL-3.0) is appropriate for the development
 of applications based on Exynize platform provided you can comply with the terms and conditions
 of the GNU Lesser General Public License v3 (LGPL-3.0).
 
-- Commercial license
+## Commercial license
 
 Exynize REST licensed under Commercial license is appropriate for development of proprietary/commercial
 software where you do not want to share any source code with third parties or otherwise cannot comply with the terms
