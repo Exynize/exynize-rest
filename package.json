@@ -4,11 +4,13 @@
   "description": "Exynize REST server, part of Exynize platform",
   "main": "index.js",
   "scripts": {
-    "start": "npm run db-start && npm run server",
+    "start": "npm run start-db && npm run server",
     "server": "nodemon --ignore src/static index.js",
     "postinstall": "babel-node setup.js",
-    "db-start": "docker run -d -p 28015:28015 -p 8080:8080 --name rethinkpipes rethinkdb",
-    "db-stop": "docker stop rethinkpipes"
+    "start-db": "docker run -d -p 28015:28015 -p 8080:8080 --name rethinkpipes rethinkdb",
+    "stop-db": "docker stop rethinkpipes",
+    "build-docker": "docker build -t exynize-rest .",
+    "start-docker": "docker run -it --rm --link rethinkpipes:rdb -e EXYNIZE_DB_HOST=rdb --name exynize-rest exynize-rest"
   },
   "repository": {
     "type": "git",
