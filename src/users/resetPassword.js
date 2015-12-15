@@ -6,6 +6,7 @@ import sendEmail from './sendEmail';
 import {asyncRequest} from '../util';
 
 const handler = async (req, res) => {
+    const host = process.env.EXYNIZE_HOST || req.get('host');
     const {email} = req.body;
     const resetId = uuid.v1();
     logger.debug('reset pass for: ', email, 'with resetId:', resetId);
@@ -22,7 +23,7 @@ const handler = async (req, res) => {
             },
         });
         // generate email
-        const resetLink = `http://${req.get('host')}/api/password/reset/${resetId}`;
+        const resetLink = `http://${host}/api/password/reset/${resetId}`;
         const text = `Hi there,
         Please Click on the link to reset your password: ${resetId}`;
         const html = `Hi there,<br/>

@@ -6,6 +6,7 @@ import sendEmail from '../users/sendEmail';
 import {User} from '../db';
 
 const handler = async (req, res) => {
+    const host = process.env.EXYNIZE_HOST || req.get('host');
     const {id, email} = req.body;
     logger.debug('sending approve email to:', email, id);
 
@@ -21,7 +22,7 @@ const handler = async (req, res) => {
     });
 
     // generate email
-    const resetLink = `http://${req.get('host')}/api/password/reset/${resetId}`;
+    const resetLink = `http://${host}/api/password/reset/${resetId}`;
     const text = `Congratulations!
     You have been invited to try Exynize platform.
     Please click on the link to set up your new password: ${resetLink}

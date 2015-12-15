@@ -5,6 +5,7 @@ import sendEmail from './sendEmail';
 import {asyncRequest} from '../util';
 
 const handler = async (req, res) => {
+    const host = process.env.EXYNIZE_HOST || req.get('host');
     const {name, email, requestDescription} = req.body;
     const verifyId = uuid.v1();
     logger.debug('access requested for: ', name, email, requestDescription, 'with verifyId:', verifyId);
@@ -25,7 +26,7 @@ const handler = async (req, res) => {
     }
 
     // send email
-    const verifyLink = `http://${req.get('host')}/api/verify/${verifyId}`;
+    const verifyLink = `http://${host}/api/verify/${verifyId}`;
     const text = `Hi there,
     Please Click on the link to verify your email: ${verifyLink}`;
     const html = `Hi there,<br/>
