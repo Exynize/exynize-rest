@@ -1,6 +1,6 @@
 {
   "name": "exynize-rest",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Exynize REST server, part of Exynize platform",
   "main": "index.js",
   "scripts": {
