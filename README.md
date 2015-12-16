@@ -29,11 +29,7 @@ Alternatively you can use docker environment provided with a supplied Dockerfile
 
 ### Installation
 
-1. Clone the repository and cd into new folder:
-```
-➜  git clone git@github.com:Exynize/exynize-rest.git
-➜  cd exynize-rest
-```
+1. Clone the repository and cd into new folder: `git clone git@github.com:Exynize/exynize-rest.git && cd exynize-rest`
 2. Execute `npm install`
 3. Execute `npm start` (this will also start a docker container with RethinkDB)
 4. Exynize REST will start working on `http://localhost:8080`
@@ -45,4 +41,4 @@ Alternatively, you can use Dockerfile to assemble docker container and then star
 ## License
 
 Dual licensed under LGPL-3.0 and commercial license.
-See LICENSE file for more details.
+See LICENSE.md file for more details.
