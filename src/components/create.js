@@ -52,6 +52,10 @@ const handler = async (req, res, next) => {
                 resolve: {
                     modulesDirectories: [join(__dirname, '..', 'client', 'node_modules')],
                 },
+                externals: [
+                    'react',
+                    'react-dom',
+                ],
             }, (a, b) => {
                 if (_.isArray(a)) {
                     return a.concat(b);
