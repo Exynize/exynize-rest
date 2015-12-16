@@ -21,7 +21,7 @@ const handler = async (req, res) => {
     }
     logger.debug('got user: ', user);
     await User.update(user.id, {isEmailValid: true, verifyId: '0'});
-    res.status(200).send(`Your email was successfully activated! We'll notify you once you've been granted access.`);
+    res.status(200).send(`Your email was successfully activated! You can login <a href="/">now</a>.`);
 };
 
 export default asyncRequest.bind(null, handler);

@@ -13,7 +13,7 @@ const handler = async (req, res) => {
     const user = await User.find({
         email,
         password: hashedPassword,
-        isApproved: true,
+        isEmailValid: true,
     });
     // check if user was found
     if (!user) {
