@@ -1,17 +1,20 @@
+import uuid from 'node-uuid';
 import logger from '../logger';
 import {authedSocket} from '../sockutil';
-import {runInVm} from '../vm';
+import {runWithRabbit} from '../runner';
 
 export default (ws) => {
     let sub;
 
     const start = (data) => {
-        const {args, source, componentType} = data;
+        const {source, componentType, args} = data;
+        const id = uuid.v1();
         logger.debug('executing component source:', source);
         logger.debug('executing component type:', componentType);
         logger.debug('with args:', args);
+        logger.debug('with id:', id);
         try {
-            sub = runInVm(source, args, componentType)
+            sub = runWithRabbit({source, componentType, args, id})
             .subscribe(
                 execRes => {
                     logger.debug('exec result:', execRes);
@@ -20,6 +23,7 @@ export default (ws) => {
                 e => {
                     logger.debug('exec error:', e);
                     ws.send(JSON.stringify({error: e.message}));
+                    ws.close();
                 },
                 () => {
                     logger.debug('exec done!');

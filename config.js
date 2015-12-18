@@ -21,3 +21,8 @@ export const email = {
 export const jwtconf = {
     secret: process.env.EXYNIZE_JWT_SECRET || 'default-jwt-secret',
 };
+
+export const rabbit = {
+    host: process.env.RABBITMQ_NODENAME || 'docker.dev',
+    exchange: 'exynize.components.exchange',
+};
