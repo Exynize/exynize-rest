@@ -14,7 +14,7 @@ export default (ws) => {
         logger.debug('with args:', args);
         logger.debug('with id:', id);
         try {
-            sub = runWithRabbit({source, componentType, args, id})
+            sub = runWithRabbit({source, componentType, args, id, mode: 'test'})
             .subscribe(
                 execRes => {
                     logger.debug('exec result:', execRes);
