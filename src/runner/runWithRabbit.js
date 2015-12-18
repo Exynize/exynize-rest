@@ -24,7 +24,7 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
         await channel.assertExchange(rabbit.exchange, 'topic');
         logger.debug('got exchange');
         // assig queue
-        const {queue} = await channel.assertQueue('exynize-runner-exec-queue', {exclusive: true});
+        const {queue} = await channel.assertQueue(`exynize-runner-exec-${data.id}-queue`, {exclusive: true});
         logger.debug('got queue');
         // bind to key
         await channel.bindQueue(queue, rabbit.exchange, 'runner.result.' + data.id);
