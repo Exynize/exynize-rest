@@ -13,25 +13,25 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
     };
 
     const run = async () => {
-        logger.debug('rwr: run');
+        logger.debug('[rwr]: run');
         channel = await getChannel();
-        logger.debug('rwr: got channel');
+        logger.debug('[rwr]: got channel');
         // assig queue
         const {queue} = await channel.assertQueue(`exynize-runner-exec-${data.id}-queue`, {exclusive: true});
-        logger.debug('rwr: got queue');
+        logger.debug('[rwr]: got queue');
         // bind to key
         await channel.bindQueue(queue, rabbit.exchange, 'runner.result.' + data.id);
         // listen for messages
         channel.consume(queue, (incData) => {
             const msg = JSON.parse(incData.content.toString());
-            logger.debug('rwr: got message:', msg);
+            logger.debug('[rwr]: got message:', msg);
             // acknowledge
             channel.ack(incData);
             // return depending on type
             returnByType[msg.type](msg.data);
         });
         // send
-        logger.debug('rwr: sending:', data);
+        logger.debug('[rwr]: sending:', data);
         channel.publish(rabbit.exchange, 'runner.execute', new Buffer(JSON.stringify(data)));
     };
 
@@ -39,7 +39,7 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
     run().catch(e => obs.onError(e));
     // cleanup
     return () => {
-        logger.debug('rwr: cleanup');
+        logger.debug('[rwr]: cleanup');
         channel.publish(rabbit.exchange, 'runner.kill', new Buffer(JSON.stringify({id: data.id})));
     };
 });
