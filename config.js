@@ -8,6 +8,9 @@ export const db = {
     password: '',
 };
 
+export const requireEmailValidation = process.env.EXYNIZE_MAIL_VALIDATION ?
+    process.env.EXYNIZE_MAIL_VALIDATION === '1' : true;
+
 export const email = {
     host: process.env.EXYNIZE_MAIL_HOST || 'mail.server.com',
     port: process.env.EXYNIZE_MAIL_PORT || 465,

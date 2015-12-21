@@ -4,6 +4,7 @@ import sendEmail from './sendEmail';
 import logger from '../logger';
 import {User} from '../db';
 import {asyncRequest} from '../util';
+import {requireEmailValidation} from '../../config';
 
 const handler = async (req, res) => {
     const host = process.env.EXYNIZE_HOST || req.get('host');
@@ -16,7 +17,7 @@ const handler = async (req, res) => {
         email,
         password: hashedPassword,
         verifyId,
-        isEmailValid: false,
+        isEmailValid: !requireEmailValidation,
     });
 
     if (!user) {
@@ -25,24 +26,24 @@ const handler = async (req, res) => {
         return;
     }
 
-    logger.debug('created user: ', user);
+    if (requireEmailValidation) {
+        // send email
+        const verifyLink = `http://${host}/api/verify/${verifyId}`;
+        const text = `Hi there,
+        Please Click on the link to verify your email: ${verifyLink}`;
+        const html = `Hi there,<br/>
+        Please Click on the link to verify your email.<br/>
+        <a href="${verifyLink}">Click here to verify</a><br/>
+        Or open this in a browser: ${verifyLink}.`;
 
-    // send email
-    const verifyLink = `http://${host}/api/verify/${verifyId}`;
-    const text = `Hi there,
-    Please Click on the link to verify your email: ${verifyLink}`;
-    const html = `Hi there,<br/>
-    Please Click on the link to verify your email.<br/>
-    <a href="${verifyLink}">Click here to verify</a><br/>
-    Or open this in a browser: ${verifyLink}.`;
-
-    // send email
-    await sendEmail({
-        to: email,
-        subject: 'Exynize: Confirm Your Email',
-        text,
-        html,
-    });
+        // send email
+        await sendEmail({
+            to: email,
+            subject: 'Exynize: Confirm Your Email',
+            text,
+            html,
+        });
+    }
 
     logger.debug('created user: ', user);
     res.sendStatus(201);
