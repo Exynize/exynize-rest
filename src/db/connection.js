@@ -14,7 +14,7 @@ const setup = async function() {
     }
 
     // create tables and indices
-    await* [
+    await Promise.all([
         // users
         r.db(dbConfig.database).tableCreate('users').run(connection),
         // components
@@ -25,7 +25,7 @@ const setup = async function() {
         r.db(dbConfig.database).tableCreate('pipelineLog').run(connection),
         // pipeline communication bus
         r.db(dbConfig.database).tableCreate('exynize_rest_exchange').run(connection),
-    ];
+    ]);
 };
 
 const rdb = async function() {
