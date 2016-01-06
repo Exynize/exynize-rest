@@ -9,11 +9,13 @@ import {Component} from '../db';
 
 const handler = async (req, res, next) => {
     const {id, name, description, source, params, type, isPublic, isSourcePublic} = req.body;
-    logger.debug('creating component', name, description, source, params, type, isPublic, isSourcePublic);
+    const refName = _.kebabCase(name);
+    logger.debug('creating component', name, refName, description, source, params, type, isPublic, isSourcePublic);
     let result;
     if (id) {
         result = await Component.update(id, {
             name,
+            refName,
             description,
             source,
             type,
@@ -26,6 +28,7 @@ const handler = async (req, res, next) => {
         // create new component
         result = await Component.create({
             name,
+            refName,
             description,
             source,
             type,

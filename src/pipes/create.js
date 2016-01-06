@@ -1,15 +1,18 @@
+import _ from 'lodash';
 import logger from '../logger';
 import {Pipeline} from '../db';
 import {asyncRequest} from '../util';
 
 const handler = async (req, res) => {
     const {id, name, source, components, render, isPublic} = req.body;
-    logger.debug('creating pipleine', name, source, components, render, isPublic, 'with id:', id);
+    const refName = _.kebabCase(name);
+    logger.debug('creating pipleine', name, refName, source, components, render, isPublic, 'with id:', id);
     // create new component
     let result;
     if (id) {
         result = await Pipeline.update(id, {
             name,
+            refName,
             source,
             components,
             render,
@@ -19,6 +22,7 @@ const handler = async (req, res) => {
     } else {
         result = await Pipeline.create({
             name,
+            refName,
             source,
             components,
             render,
