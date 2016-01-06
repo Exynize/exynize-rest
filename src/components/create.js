@@ -8,33 +8,31 @@ import logger from '../logger';
 import {Component} from '../db';
 
 const handler = async (req, res, next) => {
-    const {id, name, description, source, params, type, isPublic, isSourcePublic} = req.body;
+    const {id, name, description, version, source, params, type, isPublic, isSourcePublic} = req.body;
     const refName = _.kebabCase(name);
-    logger.debug('creating component', name, refName, description, source, params, type, isPublic, isSourcePublic);
+    logger.debug('creating component',
+        name, refName, description, version, source, params,
+        type, isPublic, isSourcePublic);
+    // create data
+    const componentData = {
+        name,
+        refName,
+        version,
+        description,
+        source,
+        type,
+        params,
+        isPublic: Boolean(isPublic),
+        isSourcePublic: Boolean(isSourcePublic),
+    };
     let result;
     if (id) {
-        result = await Component.update(id, {
-            name,
-            refName,
-            description,
-            source,
-            type,
-            params,
-            isPublic: Boolean(isPublic),
-            isSourcePublic: Boolean(isSourcePublic),
-        });
+        result = await Component.update(id, componentData);
         logger.debug('updated component: ', result);
     } else {
         // create new component
         result = await Component.create({
-            name,
-            refName,
-            description,
-            source,
-            type,
-            params,
-            isPublic: Boolean(isPublic),
-            isSourcePublic: Boolean(isSourcePublic),
+            ...componentData,
             user: req.userInfo.id,
         });
         logger.debug('created component: ', result);
