@@ -39,7 +39,8 @@ export const runPipeline = (pipeline) => {
     return {
         stream,
         clean() {
-            toKill.map(id => stopWithRabbit(id));
+            logger.debug('got clean command:', toKill);
+            return toKill.map(id => stopWithRabbit(id));
         },
     };
 };

@@ -38,16 +38,6 @@ setupDb().then(() => {
         }, 500);
     };
 
-    // listen for commands
-    testExchange
-        .queue(topic => topic.eq(id + '.in'))
-        .subscribe((topic, payload) => {
-            logger.debug('[IN] for topic:', topic, 'got payload:', payload);
-            if (payload.command === 'kill') {
-                delayedExit();
-            }
-        });
-
     // if executed in production - set pipeline status to 'running'
     promises.push(Pipeline.update(id, {
         status: 'running',
@@ -57,6 +47,19 @@ setupDb().then(() => {
     // start pipeline
     logger.debug('executing pipeline..');
     const {stream, clean} = runPipeline(pipeline);
+
+    // listen for commands
+    testExchange
+        .queue(topic => topic.eq(id + '.in'))
+        .subscribe((topic, payload) => {
+            logger.debug('[IN] for topic:', topic, 'got payload:', payload);
+            if (payload.command === 'kill') {
+                clean().forEach(p => promises.push(p));
+                delayedExit();
+            }
+        });
+
+    // subscribe to results
     stream.subscribe(
         data => {
             logger.debug('[OUT] seding pipeline response:', data, 'to topic:', id);
@@ -80,7 +83,7 @@ setupDb().then(() => {
             }));
         }, () => {
             logger.debug('[OUT] pipeline done, scheduling exit');
-            clean();
+            clean().forEach(p => promises.push(p));
             delayedExit();
         }
     );
