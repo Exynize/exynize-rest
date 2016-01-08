@@ -21,9 +21,11 @@ export const compileWithRabbit = (id, source) => new Promise((resolve, reject) =
             channel.ack(incData);
             // reject if error
             if (msg.error) {
+                logger.error('[cwr]: error, ', msg.error);
                 return reject(msg.error);
             }
             // return data
+            logger.debug('[cwr]: done...');
             return resolve(msg.data);
         });
         // send

@@ -1,15 +1,19 @@
 import logger from '../logger';
 import {rdb} from './connection';
 
+const userFields = ['id', 'email', 'username'];
+
 const table = async function() {
     const {db, connection} = await rdb();
     const t = db.table('components');
-    return {t, connection};
+    return {db, t, connection};
 };
 
 const find = async function(pattern) {
-    const {t, connection} = await table();
-    const cursor = await t.filter(pattern).run(connection);
+    const {db, t, connection} = await table();
+    const cursor = await t.filter(pattern)
+        .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+        .run(connection);
     let result = [];
     try {
         result = await cursor.toArray();
