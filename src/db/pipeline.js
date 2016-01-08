@@ -1,6 +1,8 @@
 import logger from '../logger';
 import {rdb} from './connection';
 
+const userFields = ['id', 'email', 'username'];
+
 const table = async function() {
     const {db, connection} = await rdb();
     const t = db.table('pipelines');
@@ -10,7 +12,7 @@ const table = async function() {
 const find = async function(pattern) {
     const {db, t, connection} = await table();
     const cursor = await t.filter(pattern)
-        .merge(pipe => ({user: db.table('users').get(pipe('user')).without('password')}))
+        .merge(pipe => ({user: db.table('users').get(pipe('user')).pluck(userFields)}))
         .merge(pipe => ({
             source: pipe('source').merge(comp => db.table('components').get(comp('id'))),
             components: pipe('components').merge(comp => db.table('components').get(comp('id'))),
@@ -37,7 +39,7 @@ const get = async function(id: string|Object) {
     let result = null;
     try {
         result = await t.get(id)
-            .merge(pipe => ({user: db.table('users').get(pipe('user')).without('password')}))
+            .merge(pipe => ({user: db.table('users').get(pipe('user')).pluck(userFields)}))
             .merge(pipe => ({
                 source: pipe('source').merge(comp => db.table('components').get(comp('id'))),
                 components: pipe('components').merge(comp => db.table('components').get(comp('id'))),
