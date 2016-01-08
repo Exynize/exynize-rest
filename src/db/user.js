@@ -52,9 +52,15 @@ const findAll = async function(pattern) {
 
 const create = async function(data: Object) {
     const {t, connection} = await table();
-    const existingUserCount = await t.filter(data).count().run(connection);
+    // check for email
+    let existingUserCount = await t.filter({email: data.email}).count().run(connection);
     if (existingUserCount > 0) {
         throw new Error('User with given email already exists!');
+    }
+    // check for username
+    existingUserCount = await t.filter({username: data.username}).count().run(connection);
+    if (existingUserCount > 0) {
+        throw new Error('User with given username already exists!');
     }
     const res = await t.insert(data).run(connection);
     const id = res.generated_keys[0];

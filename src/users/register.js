@@ -8,13 +8,14 @@ import {requireEmailValidation} from '../../config';
 
 const handler = async (req, res) => {
     const host = process.env.EXYNIZE_HOST || req.get('host');
-    const {email, password} = req.body;
+    const {email, username, password} = req.body;
     const hashedPassword = hash(password);
     const verifyId = uuid.v1();
     logger.debug('adding: ', email, hashedPassword);
     // find user
     const user = await User.create({
         email,
+        username,
         password: hashedPassword,
         verifyId,
         isEmailValid: !requireEmailValidation,
@@ -29,9 +30,9 @@ const handler = async (req, res) => {
     if (requireEmailValidation) {
         // send email
         const verifyLink = `http://${host}/api/verify/${verifyId}`;
-        const text = `Hi there,
+        const text = `Hi ${username},
         Please Click on the link to verify your email: ${verifyLink}`;
-        const html = `Hi there,<br/>
+        const html = `Hi ${username},<br/>
         Please Click on the link to verify your email.<br/>
         <a href="${verifyLink}">Click here to verify</a><br/>
         Or open this in a browser: ${verifyLink}.`;
