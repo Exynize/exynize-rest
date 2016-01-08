@@ -1,5 +1,6 @@
 import checkToken from '../users/checkToken';
-import getComponents from './get';
+import getComponents from './getAll';
+import getComponent from './get';
 import createComponent from './create';
 import executeComponent from './execute';
 
@@ -9,6 +10,12 @@ export default (app) => {
     .route('/api/components')
     .all(checkToken)
     .get(getComponents);
+
+    // get one
+    app
+    .route('/api/component/:user/:component')
+    .all(checkToken)
+    .get(getComponent);
 
     // create new
     app

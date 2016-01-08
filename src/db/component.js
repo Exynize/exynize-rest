@@ -29,6 +29,28 @@ const find = async function(pattern) {
     return result;
 };
 
+const getByUserAndRef = async function(username, refName) {
+    const {db, t, connection} = await table();
+    const cursor = await t.eqJoin('user', db.table('users'))
+        .filter({left: {refName}, right: {username}})
+        .map(row => row('left').merge({user: row('right').pluck(userFields)}))
+        .limit(1)
+        .run(connection);
+    let result = {};
+    try {
+        result = await cursor.next();
+    } catch (err) {
+        // check if it's just nothing found error
+        if (err.name === 'ReqlDriverError' && err.message === 'No more rows in the cursor.') {
+            logger.debug('error, no components found');
+        } else {
+            throw err;
+        }
+    }
+    connection.close();
+    return result;
+};
+
 const create = async function(data: Object) {
     const {t, connection} = await table();
     const res = t.insert(data).run(connection);
@@ -43,6 +65,7 @@ const update = async function(pattern: string|Object, data: Object) {
 
 export const Component = {
     find,
+    getByUserAndRef,
     create,
     update,
 };
