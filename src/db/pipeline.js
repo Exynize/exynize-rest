@@ -9,15 +9,29 @@ const table = async function() {
     return {db, t, connection};
 };
 
+const mergeWithComponents = (db, pipe) => ({
+    source: pipe('source').merge(
+        comp => db.table('components')
+            .get(comp('id'))
+            .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+    ),
+    components: pipe('components').merge(
+        comp => db.table('components')
+            .get(comp('id'))
+            .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+    ),
+    render: pipe('render').merge(
+        comp => db.table('components')
+            .get(comp('id'))
+            .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+    ),
+});
+
 const find = async function(pattern) {
     const {db, t, connection} = await table();
     const cursor = await t.filter(pattern)
         .merge(pipe => ({user: db.table('users').get(pipe('user')).pluck(userFields)}))
-        .merge(pipe => ({
-            source: pipe('source').merge(comp => db.table('components').get(comp('id'))),
-            components: pipe('components').merge(comp => db.table('components').get(comp('id'))),
-            render: pipe('render').merge(comp => db.table('components').get(comp('id'))),
-        }))
+        .merge(pipe => mergeWithComponents(db, pipe))
         .run(connection);
     let result = [];
     try {
@@ -39,6 +53,7 @@ const getByUserAndRef = async function(username, refName) {
     const cursor = await t.eqJoin('user', db.table('users'))
         .filter({left: {refName}, right: {username}})
         .map(row => row('left').merge({user: row('right').pluck(userFields)}))
+        .merge(pipe => mergeWithComponents(db, pipe))
         .limit(1)
         .run(connection);
     let result = {};
@@ -62,11 +77,7 @@ const get = async function(id: string|Object) {
     try {
         result = await t.get(id)
             .merge(pipe => ({user: db.table('users').get(pipe('user')).pluck(userFields)}))
-            .merge(pipe => ({
-                source: pipe('source').merge(comp => db.table('components').get(comp('id'))),
-                components: pipe('components').merge(comp => db.table('components').get(comp('id'))),
-                render: pipe('render').merge(comp => db.table('components').get(comp('id'))),
-            }))
+            .merge(pipe => mergeWithComponents(db, pipe))
             .run(connection);
     } catch (err) {
         // check if it's just nothing found error
