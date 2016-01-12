@@ -1,6 +1,7 @@
 import checkToken from '../users/checkToken';
 import createPipe from './create';
-import getPipes from './get';
+import getPipes from './getAll';
+import getPipe from './get';
 import executePipe from './execute';
 import startPipe from './start';
 import stopPipe from './stop';
@@ -14,6 +15,12 @@ export default (app) => {
     .route('/api/pipes')
     .all(checkToken)
     .get(getPipes);
+
+    // get pipeline
+    app
+    .route('/api/pipes/:user/:pipeline')
+    .all(checkToken)
+    .get(getPipe);
 
     // create new
     app
