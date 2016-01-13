@@ -4,9 +4,7 @@ import ReactDOM from 'react-dom';
 // import styles
 // styles
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-material-design/dist/css/material.min.css';
-import 'bootstrap-material-design/dist/css/ripples.min.css';
-import 'bootstrap-material-design/dist/css/roboto.min.css';
+import 'bootswatch/paper/bootstrap.min.css';
 
 const App = React.createClass({
     getInitialState() {
