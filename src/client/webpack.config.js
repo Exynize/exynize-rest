@@ -9,7 +9,7 @@ const cfg = _.merge({}, baseConfig, {
         filename: 'exynize.min.js',
     },
     resolve: {
-        modulesDirectories: [path.join(__dirname, 'node_modules')],
+        modulesDirectories: [path.join(__dirname, '..', '..', 'node_modules')],
     },
 }, (a, b) => {
     if (_.isArray(a)) {
