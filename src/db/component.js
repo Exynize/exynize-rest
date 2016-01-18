@@ -51,6 +51,25 @@ const getByUserAndRef = async function(username, refName) {
     return result;
 };
 
+const get = async function(id: string|Object) {
+    const {db, t, connection} = await table();
+    let result = null;
+    try {
+        result = await t.get(id)
+            .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+            .run(connection);
+    } catch (err) {
+        // check if it's just nothing found error
+        if (err.name === 'ReqlDriverError' && err.message === 'No more rows in the cursor.') {
+            logger.debug('error, no components found');
+        } else {
+            throw err;
+        }
+    }
+    connection.close();
+    return result;
+};
+
 const create = async function(data: Object) {
     const {t, connection} = await table();
     const res = t.insert(data).run(connection);
@@ -65,6 +84,7 @@ const update = async function(pattern: string|Object, data: Object) {
 
 export const Component = {
     find,
+    get,
     getByUserAndRef,
     create,
     update,

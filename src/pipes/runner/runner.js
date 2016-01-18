@@ -16,7 +16,7 @@ const sessionId = uuid.v1();
 const promises = [];
 
 // setup db, then do work
-setupDb().then(() => {
+setupDb().then(async () => {
     // get reply topic
     const replyTopic = testExchange.topic(id + '.out');
 
@@ -46,7 +46,7 @@ setupDb().then(() => {
 
     // start pipeline
     logger.debug('executing pipeline..');
-    const {stream, clean} = runPipeline(pipeline);
+    const {stream, clean} = await runPipeline(pipeline);
 
     // listen for commands
     testExchange

@@ -5,13 +5,13 @@ import logger from '../logger';
 export default (ws) => {
     let cleanRunners;
 
-    const start = (data: Object) => {
+    const start = async (data: Object) => {
         const {pipeline: pipelineJSON} = data;
         const pipeline = JSON.parse(pipelineJSON);
         logger.debug('executing pipe:', JSON.stringify(pipeline, null, 4));
 
         // get source
-        const {stream, clean} = runPipeline(pipeline);
+        const {stream, clean} = await runPipeline(pipeline);
         cleanRunners = clean;
         // subscribe
         stream.subscribe(
