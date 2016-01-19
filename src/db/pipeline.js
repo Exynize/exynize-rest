@@ -102,6 +102,11 @@ const update = async function(pattern: string|Object, data: Object) {
     return t.get(pattern).update(data).run(connection);
 };
 
+const changes = async function(id: string) {
+    const {t, connection} = await table();
+    logger.debug('subscribing to pipeline status:', id);
+    return t.get(id).changes().run(connection);
+};
 
 export const Pipeline = {
     find,
@@ -109,4 +114,5 @@ export const Pipeline = {
     getByUserAndRef,
     create,
     update,
+    changes,
 };

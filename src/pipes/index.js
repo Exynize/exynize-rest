@@ -8,6 +8,7 @@ import stopPipe from './stop';
 import getPipeLog from './log';
 import getPipeResult from './result';
 import getPipeSocket from './resultSocket';
+import pipeStatusSocket from './statusSocket';
 
 export default (app) => {
     // get all public
@@ -56,4 +57,6 @@ export default (app) => {
     app.ws('/api/pipes/exec', executePipe);
     // execution socket
     app.ws('/api/pipes/:id', getPipeSocket);
+    // status socket
+    app.ws('/api/pipes/:id/status', pipeStatusSocket);
 };
