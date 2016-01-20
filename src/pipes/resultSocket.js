@@ -1,10 +1,12 @@
-import {testExchange, Pipeline, PipelineLog} from '../db';
+import {Pipeline, PipelineLog} from '../db';
 import {authedSocket} from '../sockutil';
+import {listen} from '../messagebus';
 import logger from '../logger';
 
 export default (ws, req) => {
     const {id} = req.params;
     logger.debug('getting socket for', id);
+    let cleanup = () => {};
 
     const start = async () => {
         logger.debug('starting socket with id:', id);
@@ -22,10 +24,8 @@ export default (ws, req) => {
         }
 
         // otherwise subscribe to current socket result
-        testExchange
-        .queue(topic => topic.eq(id + '.out'))
-        .subscribe((topic, payload) => {
-            logger.debug('[SOCKET-RESPONSE] for topic:', topic, 'got payload:', payload);
+        cleanup = listen(id + '.out', (payload) => {
+            logger.debug('[SOCKET-RESPONSE] got payload:', payload);
             // if socket is not open
             if (ws.readyState !== 1) {
                 logger.debug('socket is already closed!');
@@ -42,5 +42,9 @@ export default (ws, req) => {
         });
     };
 
-    authedSocket(ws, {start});
+    const end = () => {
+        cleanup();
+    };
+
+    authedSocket(ws, {start, end});
 };

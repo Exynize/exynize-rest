@@ -1,6 +1,7 @@
 import logger from '../logger';
-import {Pipeline, testExchange} from '../db';
+import {Pipeline} from '../db';
 import {asyncRequest} from '../util';
+import {publish} from '../messagebus';
 
 const handler = async (req, res) => {
     const {id} = req.params;
@@ -15,8 +16,7 @@ const handler = async (req, res) => {
     const pipeline = pipelines[0];
     logger.debug('stopping pipleine', JSON.stringify(pipeline));
     // get topic
-    const childTopic = testExchange.topic(pipeline.id + '.in');
-    await childTopic.publish({command: 'kill'});
+    await publish(pipeline.id + '.in', {command: 'kill'});
     // say we're good
     res.sendStatus(204);
 };

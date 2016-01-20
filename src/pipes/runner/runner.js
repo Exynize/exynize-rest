@@ -1,7 +1,8 @@
 import r from 'rethinkdb';
 import uuid from 'node-uuid';
 import logger from '../../logger';
-import setupDb, {testExchange, PipelineLog, Pipeline} from '../../db';
+import setupDb, {PipelineLog, Pipeline} from '../../db';
+import {listen, publish} from '../../messagebus';
 import {runPipeline} from './runPipeline';
 
 // get args
@@ -17,14 +18,17 @@ const promises = [];
 
 // setup db, then do work
 setupDb().then(async () => {
+    // ref to rabbit cleanup
+    let cleanupBus = Promise.resolve();
+
     // get reply topic
-    const replyTopic = testExchange.topic(id + '.out');
+    const replyTopic = id + '.out';
 
     // delayed exit command
     const delayedExit = () => {
         // do delayed notification that we're done
         setTimeout(() => {
-            promises.push(replyTopic.publish({
+            promises.push(publish(replyTopic, {
                 data: [],
                 done: true
             }));
@@ -33,6 +37,8 @@ setupDb().then(async () => {
                 status: 'done',
                 message: 'success'
             }));
+            // close rabbit stuff
+            promises.push(cleanupBus());
             // do delayed close to say we're done
             Promise.all(promises).then(() => process.exit());
         }, 500);
@@ -49,21 +55,19 @@ setupDb().then(async () => {
     const {stream, clean} = await runPipeline(pipeline);
 
     // listen for commands
-    testExchange
-        .queue(topic => topic.eq(id + '.in'))
-        .subscribe((topic, payload) => {
-            logger.debug('[IN] for topic:', topic, 'got payload:', payload);
-            if (payload.command === 'kill') {
-                clean().forEach(p => promises.push(p));
-                delayedExit();
-            }
-        });
+    cleanupBus = await listen(id + '.in', (payload) => {
+        logger.debug('[IN] got payload:', payload);
+        if (payload.command === 'kill') {
+            clean().forEach(p => promises.push(p));
+            delayedExit();
+        }
+    });
 
     // subscribe to results
     stream.subscribe(
         data => {
             logger.debug('[OUT] seding pipeline response:', data, 'to topic:', id);
-            promises.push(replyTopic.publish({
+            promises.push(publish(replyTopic, {
                 data, done: false
             }));
             // if executed in production - push to persistent db log
