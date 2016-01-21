@@ -27,7 +27,7 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
         // listen for messages
         const {consumerTag} = await channel.consume(queue, (incData) => {
             const msg = JSON.parse(incData.content.toString());
-            logger.debug('[rwr]: got message:', msg.type);
+            // logger.debug('[rwr]: got message:', msg.type);
             // acknowledge
             channel.ack(incData);
             // return depending on type

@@ -11,10 +11,6 @@ export const serviceWithRabbit = (cfg) => {
     // run processor
     const run = async () => {
         channel = await getChannel();
-        // assig queue
-        const {queue} = await channel.assertQueue(`exynize-runner-exec-${cfg.id}-queue`, {exclusive: true});
-        cachedQueue = queue;
-        logger.debug('[svc]: got queue');
         // send
         // logger.debug('[svc]: sending:', cfg);
         await channel.publish(rabbit.exchange, 'runner.execute', new Buffer(JSON.stringify(cfg)));
@@ -36,16 +32,21 @@ export const serviceWithRabbit = (cfg) => {
             done: obs.onCompleted.bind(obs),
         };
         const runCommand = async () => {
+            // assig queue
+            const {queue} = await channel.assertQueue(`exynize-runner-cmd-result-${id}-queue`);
+            cachedQueue = queue;
+            logger.debug('[svc]: got queue');
             // bind to key
-            await channel.bindQueue(cachedQueue, rabbit.exchange, 'runner.result.' + id);
+            await channel.bindQueue(queue, rabbit.exchange, 'runner.result.' + id);
             logger.debug('[svc]: bound queue');
             // listen for messages
-            const {consumerTag} = await channel.consume(cachedQueue, (incData) => {
+            const {consumerTag} = await channel.consume(queue, (incData) => {
+                logger.debug('[svc]: incoming for:', incData.fields.routingKey);
                 const msg = JSON.parse(incData.content.toString());
                 // acknowledge
                 channel.ack(incData);
                 // log
-                logger.debug('[svc]: got message:', msg.type);//, 'for:', id);
+                logger.debug('[svc]: got message:', msg.type, 'for:', id);
                 // return depending on type
                 returnByType[msg.type](msg.data);
             });
