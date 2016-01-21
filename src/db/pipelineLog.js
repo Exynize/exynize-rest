@@ -32,6 +32,7 @@ const latest = async function(pattern) {
         .group('sessionId').ungroup().map(it => it('reduction'))
         .orderBy(r.desc(it => it('added_on')))
         .nth(0).orderBy(r.desc('added_on'))
+        .default([])
         .run(connection);
     let result = null;
     try {
