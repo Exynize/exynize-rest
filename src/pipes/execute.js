@@ -8,7 +8,7 @@ export default (ws) => {
     const start = async (data: Object) => {
         const {pipeline: pipelineJSON} = data;
         const pipeline = JSON.parse(pipelineJSON);
-        logger.debug('executing pipe:', JSON.stringify(pipeline, null, 4));
+        logger.debug('[execute] executing pipe:', JSON.stringify(pipeline, null, 4));
 
         // get source
         const {stream, clean} = await runPipeline(pipeline);
@@ -16,19 +16,20 @@ export default (ws) => {
         // subscribe
         stream.subscribe(
             resp => {
-                logger.debug('[RESPONSE]:', resp);
+                // logger.debug('[execute] response:', resp);
                 // if socket is not open
                 if (ws.readyState !== 1) {
-                    logger.debug('socket is already closed!');
+                    logger.debug('[execute] socket is already closed!');
                     return;
                 }
 
                 ws.send(JSON.stringify(resp));
             },
             e => {
-                logger.error(e);
+                logger.error('[execute]', e);
             },
             () => {
+                logger.debug('[execute] done!');
                 ws.close();
             }
         );

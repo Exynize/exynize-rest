@@ -9,13 +9,13 @@ let channel;
 // connect
 const init = async () => {
     connection = await amqp.connect(`amqp://${rabbit.host}`);
-    logger.debug('init: connected to rabbit');
+    logger.debug('[rabbit]: connected to rabbit');
     // get two channels - receive and send
     channel = await connection.createChannel();
-    logger.debug('init: got channel');
+    logger.debug('[rabbit]: got channel');
     // assing topic
     await channel.assertExchange(rabbit.exchange, 'topic');
-    logger.debug('init: got exchange');
+    logger.debug('[rabbit]: got exchange');
     return channel;
 };
 
@@ -26,3 +26,6 @@ export const getChannel = async () => {
 
     return await init();
 };
+
+// init connection
+getChannel();

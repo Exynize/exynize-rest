@@ -35,8 +35,8 @@ app.use((err, req, res, next) => { // eslint-disable-line
 const staticPrefix = process.env.NODE_ENV === 'production' ? '/api' : '';
 app.use(staticPrefix + '/static', express.static(join(__dirname, 'static')));
 // output all uncaught exceptions
-process.on('uncaughtException', err => logger.error('uncaught exception:', err.toString()));
-process.on('unhandledRejection', error => logger.error('unhandled rejection:', error.toString()));
+process.on('uncaughtException', err => logger.error('uncaught exception:', err));
+process.on('unhandledRejection', error => logger.error('unhandled rejection:', error));
 
 
 // setup api

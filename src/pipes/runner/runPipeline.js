@@ -10,15 +10,6 @@ export const runPipeline = async (pipeline) => {
     const {source} = pipeline;
     const sourceId = uuid.v1();
     logger.debug('starting source with id:', sourceId);
-    // init source
-    const srcRx = runWithRabbit({
-        source: source.source,
-        componentType: 'source',
-        args: source.args,
-        id: sourceId,
-    });
-    // say we need to kill it
-    toKill.push(sourceId);
     // get sources for componnets without source
     logger.debug('getting sources for components...');
     const componentsWithSource = pipeline.components.filter(c => c.source);
@@ -34,6 +25,15 @@ export const runPipeline = async (pipeline) => {
     }
     logger.debug('all comps:');
     logger.debug(JSON.stringify(componentsWithSource));
+    // init source
+    const srcRx = runWithRabbit({
+        source: source.source,
+        componentType: 'source',
+        args: source.args,
+        id: sourceId,
+    });
+    // say we need to kill it
+    toKill.push(sourceId);
     // init components with ids
     const components = componentsWithSource //pipeline.components
     // map with new metadata
