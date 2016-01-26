@@ -17,12 +17,6 @@ export default (app) => {
     .all(checkToken)
     .get(getPipes);
 
-    // get pipeline
-    app
-    .route('/api/pipes/:user/:pipeline')
-    .all(checkToken)
-    .get(getPipe);
-
     // create new
     app
     .route('/api/pipes')
@@ -52,6 +46,12 @@ export default (app) => {
     .route('/api/pipes/:id')
     .all(checkToken)
     .get(getPipeResult);
+
+    // get pipeline
+    app
+    .route('/api/pipes/:user/:pipeline')
+    .all(checkToken)
+    .get(getPipe);
 
     // execute pipe
     app.ws('/api/pipes/exec', executePipe);
