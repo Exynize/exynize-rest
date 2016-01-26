@@ -4,18 +4,19 @@ import {Pipeline, PipelineLog} from '../db';
 import {asyncRequest} from '../util';
 
 const json = async (req, res) => {
-    const {id} = req.params;
-    logger.debug('getting json log for', id);
+    const {user, pipeline: pipelineName} = req.params;
+    logger.debug('getting json log for', user, pipelineName);
     // get log
-    const pipelineLog = await PipelineLog.latest({pipeline: id});
+    const pipeline = await Pipeline.getByUserAndRef(user, pipelineName);
+    const pipelineLog = await PipelineLog.latest({pipeline: pipeline.id});
     // say we're good
     res.status(200).json(pipelineLog);
 };
 
 const html = async (req, res) => {
-    const {id} = req.params;
-    logger.debug('getting html result for', id);
-    const pipeline = await Pipeline.get(id);
+    const {user, pipeline: pipelineName} = req.params;
+    logger.debug('getting html result for', user, pipelineName);
+    const pipeline = await Pipeline.getByUserAndRef(user, pipelineName);
     const renderId = pipeline.render.id;
     const staticPrefix = process.env.NODE_ENV === 'production' ? '/api' : '';
     logger.debug('got compiled render:', renderId);
@@ -24,7 +25,7 @@ const html = async (req, res) => {
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>Exynize Pipeline Result: ${id}</title>
+            <title>Exynize Pipeline: ${user}/${pipelineName}</title>
         </head>
         <body>
             <div id="container"></div>

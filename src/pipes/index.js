@@ -41,22 +41,22 @@ export default (app) => {
     .all(checkToken)
     .get(getPipeLog);
 
-    // latest execution result
-    app
-    .route('/api/pipes/:id')
-    .all(checkToken)
-    .get(getPipeResult);
-
     // get pipeline
     app
     .route('/api/pipes/:user/:pipeline')
     .all(checkToken)
     .get(getPipe);
 
+    // latest execution result
+    app
+    .route('/api/pipes/:user/:pipeline/result')
+    .all(checkToken)
+    .get(getPipeResult);
+
     // execute pipe
     app.ws('/api/pipes/exec', executePipe);
     // execution socket
-    app.ws('/api/pipes/:id', getPipeSocket);
+    app.ws('/api/pipes/:user/:pipeline/result', getPipeSocket);
     // status socket
     app.ws('/api/pipes/:id/status', pipeStatusSocket);
 };
