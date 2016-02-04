@@ -1,8 +1,7 @@
 import logger from '../logger';
-import {rabbit} from '../../config';
-import {getChannel} from './connection';
+import service from './service';
 
 export const stopWithRabbit = (id) => {
     logger.debug('stopping', id);
-    return getChannel().then(ch => ch.publish(rabbit.exchange, 'runner.kill', new Buffer(JSON.stringify({id}))));
+    return service.send('runner.kill', {id});
 };

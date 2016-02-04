@@ -6,6 +6,7 @@ const logger = new winston.Logger({
             level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
             colorize: true,
             timestamp: true,
+            label: 'rest-api',
         }),
     ],
 });

@@ -1,19 +1,13 @@
 import uuid from 'node-uuid';
 import {Observable} from 'rx';
 import logger from '../logger';
-import {rabbit} from '../../config';
-import {getChannel} from './connection';
+import service from './service';
 
 export const serviceWithRabbit = (cfg) => {
-    let channel;
-    let cachedQueue;
-
     // run processor
     const run = async () => {
-        channel = await getChannel();
         // send
-        // logger.debug('[svc]: sending:', cfg);
-        await channel.publish(rabbit.exchange, 'runner.execute', new Buffer(JSON.stringify(cfg)));
+        await service.send('runner.execute', cfg);
         logger.debug('[svc]: sent execute to runner');
     };
 
@@ -25,6 +19,7 @@ export const serviceWithRabbit = (cfg) => {
         let cachedConsumerTag;
         // generate unique ID for current transaction
         const id = uuid.v4();
+        const topic = 'runner.result.' + id;
         // return by type mapping
         const returnByType = {
             result: obs.onNext.bind(obs),
@@ -32,29 +27,15 @@ export const serviceWithRabbit = (cfg) => {
             done: obs.onCompleted.bind(obs),
         };
         const runCommand = async () => {
-            // assig queue
-            const {queue} = await channel.assertQueue(`exynize-runner-cmd-result-${id}-queue`);
-            cachedQueue = queue;
-            logger.debug('[svc]: got queue');
-            // bind to key
-            await channel.bindQueue(queue, rabbit.exchange, 'runner.result.' + id);
-            logger.debug('[svc]: bound queue');
-            // listen for messages
-            const {consumerTag} = await channel.consume(queue, (incData) => {
-                logger.debug('[svc]: incoming for:', incData.fields.routingKey);
-                const msg = JSON.parse(incData.content.toString());
-                // acknowledge
-                channel.ack(incData);
+            cachedConsumerTag = await service.subscribe(topic, (msg) => {
                 // log
                 logger.debug('[svc]: got message:', msg.type, 'for:', id);
                 // return depending on type
                 returnByType[msg.type](msg.data);
             });
-            cachedConsumerTag = consumerTag;
-            // logger.debug('[svc]: got consumer tag:', consumerTag);
             // send
             const request = {id: cfg.id, responseId: id, data};
-            await channel.publish(rabbit.exchange, 'runner.command', new Buffer(JSON.stringify(request)));
+            await service.send('runner.command', request);
             // logger.debug('[svc]: sent', data, 'to', id);
         };
         // run command
@@ -65,8 +46,7 @@ export const serviceWithRabbit = (cfg) => {
         // return cleanup
         return async () => {
             logger.debug('[svc]: cleanup');
-            await channel.cancel(cachedConsumerTag);
-            await channel.unbindQueue(cachedQueue, rabbit.exchange, 'runner.result.' + id);
+            await service.unsubscribe(topic, cachedConsumerTag);
         };
     });
 };

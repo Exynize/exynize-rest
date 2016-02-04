@@ -1,12 +1,11 @@
 import Rx from 'rx';
 import logger from '../logger';
-import {rabbit} from '../../config';
-import {getChannel} from './connection';
+import service from './service';
 
 export const runWithRabbit = (data) => Rx.Observable.create(obs => {
-    let channel;
-    let cachedQueue;
     let cachedConsumerTag;
+
+    const topic = 'runner.result.' + data.id;
 
     const returnByType = {
         result: obs.onNext.bind(obs),
@@ -16,27 +15,11 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
 
     const run = async () => {
         logger.debug('[rwr]: run');
-        channel = await getChannel();
-        logger.debug('[rwr]: got channel');
-        // assig queue
-        const {queue} = await channel.assertQueue(`exynize-runner-exec-${data.id}-queue`, {exclusive: true});
-        cachedQueue = queue;
-        logger.debug('[rwr]: got queue');
-        // bind to key
-        await channel.bindQueue(queue, rabbit.exchange, 'runner.result.' + data.id);
-        // listen for messages
-        const {consumerTag} = await channel.consume(queue, (incData) => {
-            const msg = JSON.parse(incData.content.toString());
-            // logger.debug('[rwr]: got message:', msg.type);
-            // acknowledge
-            channel.ack(incData);
+        cachedConsumerTag = await service.subscribe(topic, (msg) => {
             // return depending on type
             returnByType[msg.type](msg.data);
-        });
-        cachedConsumerTag = consumerTag;
-        // send
-        // logger.debug('[rwr]: sending:', data);
-        channel.publish(rabbit.exchange, 'runner.execute', new Buffer(JSON.stringify(data)));
+        }, {exclusive: true});
+        service.send('runner.execute', data);
     };
 
     // run and catch error
@@ -47,8 +30,7 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
     // cleanup
     return async () => {
         logger.debug('[rwr]: cleanup');
-        await channel.publish(rabbit.exchange, 'runner.kill', new Buffer(JSON.stringify({id: data.id})));
-        await channel.cancel(cachedConsumerTag);
-        await channel.unbindQueue(cachedQueue, rabbit.exchange, 'runner.result.' + data.id);
+        await service.send('runner.kill', {id: data.id});
+        await service.unsubscribe(topic, cachedConsumerTag);
     };
 });
