@@ -10,7 +10,7 @@ const pipeline = JSON.parse(pipelineJSON);
 logger.debug('running child with id', id);
 
 // generate sessionId
-const sessionId = uuid.v1();
+const sessionId = uuid.v4();
 
 // promises to do before exit
 const promises = [];

@@ -8,7 +8,7 @@ import {asyncRequest} from '../util';
 const handler = async (req, res) => {
     const host = process.env.EXYNIZE_HOST || req.get('host');
     const {email} = req.body;
-    const resetId = uuid.v1();
+    const resetId = uuid.v4();
     logger.debug('reset pass for: ', email, 'with resetId:', resetId);
     // find user
     const user = await User.find({email});

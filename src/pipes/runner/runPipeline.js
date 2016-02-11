@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import uuid from 'node-uuid';
 import {Component} from '../../db';
 import logger from '../../logger';
@@ -8,7 +9,7 @@ export const runPipeline = async (pipeline) => {
     const toKill = [];
     // get source
     const {source} = pipeline;
-    const sourceId = uuid.v1();
+    const sourceId = uuid.v4();
     logger.debug('starting source with id:', sourceId);
     // get sources for componnets without source
     logger.debug('getting sources for components...');
@@ -31,6 +32,12 @@ export const runPipeline = async (pipeline) => {
         componentType: 'source',
         args: source.args,
         id: sourceId,
+    })
+    // remove id from kill list when it's done
+    .doOnCompleted(() => {
+        logger.debug('source done, removing from kill list', toKill);
+        _.remove(toKill, it => it === sourceId);
+        logger.debug('removed source from kill list', toKill);
     });
     // say we need to kill it
     toKill.push(sourceId);
@@ -39,7 +46,7 @@ export const runPipeline = async (pipeline) => {
     // map with new metadata
     .map(comp => {
         // assign id and type
-        comp.id = uuid.v1();
+        comp.id = uuid.v4();
         comp.componentType = 'processor';
         // say we need to kill it
         toKill.push(comp.id);

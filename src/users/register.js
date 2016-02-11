@@ -10,7 +10,7 @@ const handler = async (req, res) => {
     const host = process.env.EXYNIZE_HOST || req.get('host');
     const {email, username, password} = req.body;
     const hashedPassword = hash(password);
-    const verifyId = uuid.v1();
+    const verifyId = uuid.v4();
     logger.debug('adding: ', email, hashedPassword);
     // find user
     const user = await User.create({

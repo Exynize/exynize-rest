@@ -8,7 +8,7 @@ export default (ws) => {
 
     const start = (data) => {
         const {source, componentType, args} = data;
-        const id = uuid.v1();
+        const id = uuid.v4();
         logger.debug('executing component source:', source);
         logger.debug('executing component type:', componentType);
         logger.debug('with args:', args);
