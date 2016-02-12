@@ -1,5 +1,14 @@
 # Changelog
 
+0.6.0 / 2016-02-12
+==================
+
+  * use docker volume to persist compiled components upon upgrades
+  * add pipeline delete functionality
+  * add component delete method
+  * change repubsub to standalone library
+  * replace amqplib with microwork
+
 0.5.0 / 2016-01-28
 ==================
 
