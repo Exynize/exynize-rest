@@ -52,7 +52,9 @@ const latest = async function(pattern) {
 const create = async function(data: Object) {
     const {t, connection} = await table();
     logger.debug('inserting pipeline log:', data);
-    return t.insert(data).run(connection);
+    const res = await t.insert(data).run(connection);
+    connection.close();
+    return res;
 };
 
 

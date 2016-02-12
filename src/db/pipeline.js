@@ -93,13 +93,17 @@ const get = async function(id: string|Object) {
 
 const create = async function(data: Object) {
     const {t, connection} = await table();
-    return t.insert(data).run(connection);
+    const result = await t.insert(data).run(connection);
+    connection.close();
+    return result;
 };
 
 const update = async function(pattern: string|Object, data: Object) {
     const {t, connection} = await table();
     logger.debug('updating pipeline:', pattern, 'with:', data);
-    return t.get(pattern).update(data).run(connection);
+    const result = await t.get(pattern).update(data).run(connection);
+    connection.close();
+    return result;
 };
 
 const changes = async function(id: string) {

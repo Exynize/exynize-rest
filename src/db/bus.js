@@ -1,4 +1,4 @@
-import {Exchange} from './repubsub';
+import {Exchange} from 'rethinkdb-pubsub';
 import {db as dbConfig} from '../../config';
 
 export const testExchange = new Exchange('exynize_rest_exchange', {

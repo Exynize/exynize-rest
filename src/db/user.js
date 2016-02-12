@@ -64,12 +64,16 @@ const create = async function(data: Object) {
     }
     const res = await t.insert(data).run(connection);
     const id = res.generated_keys[0];
-    return await find({id});
+    const result = await find({id});
+    connection.close();
+    return result;
 };
 
 const update = async function(pattern: Object|string, data: Object|Function) {
     const {t, connection} = await table();
-    return t.get(pattern).update(data).run(connection);
+    const res = await t.get(pattern).update(data).run(connection);
+    connection.close();
+    return res;
 };
 
 export const User = {
