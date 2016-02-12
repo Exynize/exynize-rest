@@ -9,6 +9,7 @@ import getPipeLog from './log';
 import getPipeResult from './result';
 import getPipeSocket from './resultSocket';
 import pipeStatusSocket from './statusSocket';
+import deletePipe from './delete';
 
 export default (app) => {
     // get all public
@@ -45,7 +46,8 @@ export default (app) => {
     app
     .route('/api/pipes/:user/:pipeline')
     .all(checkToken)
-    .get(getPipe);
+    .get(getPipe)
+    .delete(deletePipe);
 
     // latest execution result
     app

@@ -2,6 +2,8 @@ import logger from '../logger';
 import {rdb} from './connection';
 
 const userFields = ['id', 'email', 'username'];
+const deletedUser = {username: 'deleted'};
+const deletedComponent = {user: -1, name: 'component', description: 'This component was deleted'};
 
 const table = async function() {
     const {db, connection} = await rdb();
@@ -13,17 +15,20 @@ const mergeWithComponents = (db, pipe) => ({
     source: pipe('source').merge(
         comp => db.table('components')
             .get(comp('id'))
-            .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+            .default(deletedComponent)
+            .merge(c => ({user: db.table('users').get(c('user')).default(deletedUser).pluck(userFields)}))
     ),
     components: pipe('components').merge(
         comp => db.table('components')
             .get(comp('id'))
-            .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+            .default(deletedComponent)
+            .merge(c => ({user: db.table('users').get(c('user')).default(deletedUser).pluck(userFields)}))
     ),
     render: pipe('render').merge(
         comp => db.table('components')
             .get(comp('id'))
-            .merge(c => ({user: db.table('users').get(c('user')).pluck(userFields)}))
+            .default(deletedComponent)
+            .merge(c => ({user: db.table('users').get(c('user')).default(deletedUser).pluck(userFields)}))
     ),
 });
 
@@ -112,6 +117,13 @@ const changes = async function(id: string) {
     return t.get(id).changes().run(connection);
 };
 
+const del = async function(id) {
+    const {t, connection} = await table();
+    const result = await t.get(id).delete().run(connection);
+    connection.close();
+    return result;
+};
+
 export const Pipeline = {
     find,
     get,
@@ -119,4 +131,5 @@ export const Pipeline = {
     create,
     update,
     changes,
+    del,
 };
