@@ -3,6 +3,7 @@ import getComponents from './getAll';
 import getComponent from './get';
 import createComponent from './create';
 import executeComponent from './execute';
+import deleteComponent from './delete';
 
 export default (app) => {
     // get all public
@@ -15,7 +16,8 @@ export default (app) => {
     app
     .route('/api/component/:user/:component')
     .all(checkToken)
-    .get(getComponent);
+    .get(getComponent)
+    .delete(deleteComponent);
 
     // create new
     app

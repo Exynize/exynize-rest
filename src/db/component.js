@@ -82,10 +82,18 @@ const update = async function(pattern: string|Object, data: Object) {
     return t.get(pattern).update(data).run(connection);
 };
 
+const del = async function(id) {
+    const {t, connection} = await table();
+    const result = await t.get(id).delete().run(connection);
+    connection.close();
+    return result;
+};
+
 export const Component = {
     find,
     get,
     getByUserAndRef,
     create,
     update,
+    del,
 };
