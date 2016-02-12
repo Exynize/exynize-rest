@@ -10,6 +10,8 @@ RUN npm install --silent
 # Bundle source
 COPY . /opt/app
 
+# Create volume for compiled UI components
+VOLUME /opt/app/src/static
 # Expose port 8080
 EXPOSE 8080
 # Define default command.
