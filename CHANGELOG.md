@@ -1,5 +1,10 @@
 # Changelog
 
+0.6.1 / 2016-02-12
+==================
+
+  * update to microwork 0.7 for reconnect support
+
 0.6.0 / 2016-02-12
 ==================
 
