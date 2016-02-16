@@ -3,6 +3,7 @@ import uuid from 'node-uuid';
 import logger from '../../logger';
 import setupDb, {testExchange, PipelineLog, Pipeline} from '../../db';
 import {runPipeline} from './runPipeline';
+import service from '../../runner/service';
 
 // get args
 const [,, id, pipelineJSON] = process.argv;
@@ -33,6 +34,8 @@ setupDb().then(async () => {
                 status: 'done',
                 message: 'success'
             }));
+            // shut down microwork service
+            promises.push(service.stop());
             // do delayed close to say we're done
             Promise.all(promises).then(() => process.exit());
         }, 500);
