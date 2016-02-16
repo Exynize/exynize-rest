@@ -46,7 +46,7 @@ setupDb().then(async () => {
 
     // start pipeline
     logger.debug('executing pipeline..');
-    const {stream, clean} = await runPipeline(pipeline);
+    const {stream, clean} = await runPipeline(pipeline, true);
 
     // listen for commands
     testExchange

@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import uuid from 'node-uuid';
-import {Component} from '../../db';
+import {Component, Pipeline} from '../../db';
 import logger from '../../logger';
 import {runWithRabbit, serviceWithRabbit, stopWithRabbit} from '../../runner';
 
-export const runPipeline = async (pipeline) => {
+export const runPipeline = async (pipeline, saveInstanceIDs = false) => {
     // logger.debug('running pipeline:', pipeline);
     const toKill = [];
     // get source
@@ -54,6 +54,17 @@ export const runPipeline = async (pipeline) => {
     })
     // map to services
     .map(comp => serviceWithRabbit(comp));
+
+    // if needed, save instance IDs to db
+    if (saveInstanceIDs && pipeline.id) {
+        logger.debug('saving instance ids:', pipeline.id);
+        await Pipeline.update(pipeline.id, {
+            instance: {
+                sourceId,
+                componentsIds: toKill.filter(id => id !== sourceId),
+            }
+        });
+    }
 
     // reduce to stream and return
     const stream = components.reduce((s, fn) => s.flatMap(fn), srcRx);
