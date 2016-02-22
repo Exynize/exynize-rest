@@ -3,6 +3,7 @@ import logger from '../logger';
 import {Pipeline} from '../db';
 import {asyncRequest} from '../util';
 import service from '../runner/service';
+import {rabbit} from '../../config';
 
 const handler = async (req, res) => {
     logger.debug('searching for pipeline', req.params.user, req.params.pipeline);
@@ -17,7 +18,7 @@ const handler = async (req, res) => {
         ..._.pick(req, ['body', 'cookies', 'method', 'query'])
     };
     const request = {id: pipeline.instance.sourceId, data};
-    await service.send('runner.command', request, {expiration: 500});
+    await service.send('runner.command', request, {expiration: rabbit.messageExpiration});
     // return
     res.sendStatus(202);
 };

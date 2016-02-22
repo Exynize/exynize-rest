@@ -2,12 +2,13 @@ import uuid from 'node-uuid';
 import {Observable} from 'rx';
 import logger from '../logger';
 import service from './service';
+import {rabbit} from '../../config';
 
 export const serviceWithRabbit = (cfg) => {
     // run processor
     const run = async () => {
         // send
-        await service.send('runner.execute', cfg);
+        await service.send('runner.execute', cfg, {expiration: rabbit.messageExpiration});
         logger.debug('[svc]: sent execute to runner');
     };
 
@@ -35,7 +36,7 @@ export const serviceWithRabbit = (cfg) => {
             });
             // send
             const request = {id: cfg.id, responseId: id, data};
-            await service.send('runner.command', request);
+            await service.send('runner.command', request, {expiration: rabbit.messageExpiration});
             // logger.debug('[svc]: sent', data, 'to', id);
         };
         // run command

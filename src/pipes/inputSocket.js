@@ -1,6 +1,7 @@
 import logger from '../logger';
 import {Pipeline} from '../db';
 import service from '../runner/service';
+import {rabbit} from '../../config';
 
 export default async (ws, req) => {
     const {user, pipeline: pipelineName} = req.params;
@@ -24,6 +25,6 @@ export default async (ws, req) => {
             ...incData,
         };
         const request = {id: pipeline.instance.sourceId, data};
-        await service.send('runner.command', request, {expiration: 500});
+        await service.send('runner.command', request, {expiration: rabbit.messageExpiration});
     });
 };

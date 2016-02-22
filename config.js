@@ -28,4 +28,5 @@ export const jwtconf = {
 export const rabbit = {
     host: process.env.RABBITMQ_NODENAME || 'docker.dev',
     exchange: 'exynize.components.exchange',
+    messageExpiration: process.env.RABBITMQ_EXPIRATION || 500,
 };

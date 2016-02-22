@@ -1,6 +1,7 @@
 import Rx from 'rx';
 import logger from '../logger';
 import service from './service';
+import {rabbit} from '../../config';
 
 export const runWithRabbit = (data) => Rx.Observable.create(obs => {
     let cachedConsumerTag;
@@ -19,7 +20,7 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
             // return depending on type
             returnByType[msg.type](msg.data);
         }, {exclusive: true});
-        service.send('runner.execute', data);
+        service.send('runner.execute', data, {expiration: rabbit.messageExpiration});
     };
 
     // run and catch error
@@ -30,7 +31,7 @@ export const runWithRabbit = (data) => Rx.Observable.create(obs => {
     // cleanup
     return async () => {
         logger.debug('[rwr]: cleanup');
-        await service.send('runner.kill', {id: data.id});
+        await service.send('runner.kill', {id: data.id}, {expiration: rabbit.messageExpiration});
         await service.unsubscribe(topic, cachedConsumerTag);
     };
 });

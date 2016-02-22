@@ -1,5 +1,6 @@
 import logger from '../logger';
 import service from './service';
+import {rabbit} from '../../config';
 
 export const compileWithRabbit = (id, source) => new Promise((resolve, reject) => {
     logger.debug('compiling');
@@ -22,7 +23,7 @@ export const compileWithRabbit = (id, source) => new Promise((resolve, reject) =
         }, {exclusive: true});
         // send
         logger.debug('[cwr]: sending:', id, source);
-        service.send('runner.compile', {id, source});
+        service.send('runner.compile', {id, source}, {expiration: rabbit.messageExpiration});
         // define cleanup
         cleanup = async () => {
             logger.debug('[cwr]: cleanup...');
