@@ -22,7 +22,10 @@ setupDb().then(async () => {
     const replyTopic = testExchange.topic(id + '.out');
 
     // delayed exit command
-    const delayedExit = () => {
+    const delayedExit = ({
+        status = 'done',
+        message = 'success',
+    }) => {
         // do delayed notification that we're done
         setTimeout(() => {
             promises.push(replyTopic.publish({
@@ -30,10 +33,7 @@ setupDb().then(async () => {
                 done: true
             }));
             // if executed in production - update status to done
-            promises.push(Pipeline.update(id, {
-                status: 'done',
-                message: 'success'
-            }));
+            promises.push(Pipeline.update(id, {status, message}));
             // shut down microwork service
             promises.push(service.stop());
             // do delayed close to say we're done
@@ -79,11 +79,13 @@ setupDb().then(async () => {
         },
         e => {
             logger.error('[OUT] error in pipline:', e);
-            // if executed in production - update status to error
-            promises.push(Pipeline.update(id, {
+            // schedule exit
+            logger.debug('[OUT] scheduling exit...');
+            clean().forEach(p => promises.push(p));
+            delayedExit({
                 status: 'error',
                 message: e.message
-            }));
+            });
         }, () => {
             logger.debug('[OUT] pipeline done, scheduling exit');
             clean().forEach(p => promises.push(p));
