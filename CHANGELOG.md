@@ -1,5 +1,11 @@
 # Changelog
 
+0.9.0 / 2016-02-22
+==================
+
+  * public pipeline results support
+  * only allow pipeline actions if invoked by owner
+
 0.8.0 / 2016-02-22
 ==================
 
