@@ -25,8 +25,10 @@ export default (ws) => {
 
                 ws.send(JSON.stringify(resp));
             },
-            e => {
-                logger.error('[execute]', e);
+            error => {
+                logger.error('[execute] error:', error);
+                ws.send(JSON.stringify({error}));
+                ws.close();
             },
             () => {
                 logger.debug('[execute] done!');
