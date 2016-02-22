@@ -14,6 +14,10 @@ const handler = async (req, res) => {
 
     const pipeline = pipelines[0];
     logger.debug('stopping pipleine', JSON.stringify(pipeline));
+    // only allow starting if owner
+    if (pipeline.user.username !== req.userInfo.username) {
+        return res.status(403).json(`You don't have permission to do this!`);
+    }
     // get topic
     const childTopic = testExchange.topic(pipeline.id + '.in');
     await childTopic.publish({command: 'kill'});
