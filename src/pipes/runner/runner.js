@@ -25,7 +25,7 @@ setupDb().then(async () => {
     const delayedExit = ({
         status = 'done',
         message = 'success',
-    }) => {
+    } = {}) => {
         // do delayed notification that we're done
         setTimeout(() => {
             promises.push(replyTopic.publish({
