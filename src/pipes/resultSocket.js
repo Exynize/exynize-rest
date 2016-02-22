@@ -1,16 +1,33 @@
 import {testExchange, Pipeline, PipelineLog} from '../db';
-import {authedSocket} from '../sockutil';
+import {checkStringToken} from '../users/checkToken';
 import logger from '../logger';
 
 export default (ws, req) => {
     const {user, pipeline: pipelineName} = req.params;
     logger.debug('getting socket for', user, pipelineName);
 
-    const start = async () => {
+    // listen for message
+    ws.on('message', async (msg) => {
+        const data = JSON.parse(msg);
+
         logger.debug('starting socket with id:', user, pipelineName);
         // get pipeline
         const pipeline = await Pipeline.getByUserAndRef(user, pipelineName);
         logger.debug('found pipeline', pipeline.id);
+        // check for auth if needed
+        if (!pipeline.isPublic) {
+            // check auth
+            try {
+                const authUser = await checkStringToken(data.token);
+                if (!authUser || authUser.username !== user) {
+                    throw new Error('Not authorized');
+                }
+            } catch (e) {
+                ws.send(JSON.stringify({error: e.message}));
+                ws.close();
+                return;
+            }
+        }
         // if pipeline is not running, just send latest results from DB
         const pipelineLog = await PipelineLog.latest({pipeline: pipeline.id});
         const res = pipelineLog.map(it => it.data);
@@ -40,7 +57,5 @@ export default (ws, req) => {
 
             ws.send(JSON.stringify(payload.data));
         });
-    };
-
-    authedSocket(ws, {start});
+    });
 };

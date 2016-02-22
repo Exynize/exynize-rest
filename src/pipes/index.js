@@ -58,7 +58,6 @@ export default (app) => {
     // latest execution result
     app
     .route('/api/pipes/:user/:pipeline/result')
-    .all(checkToken)
     .get(getPipeResult);
 
     // pipeline inputs:

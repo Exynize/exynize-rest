@@ -4,7 +4,7 @@ import {User} from '../db';
 import {jwtconf} from '../../config';
 
 // token from request
-const requestToToken = (req) => req.body.token || req.query.token || req.headers['x-access-token'];
+export const requestToToken = (req) => req.body.token || req.query.token || req.headers['x-access-token'];
 
 export const checkStringToken = async (token: string) : Object => {
     logger.debug('checking token: ', token);
