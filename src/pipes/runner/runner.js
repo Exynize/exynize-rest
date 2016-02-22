@@ -79,12 +79,22 @@ setupDb().then(async () => {
         },
         e => {
             logger.error('[OUT] error in pipline:', e);
+            // if executed in production - push error to persistent db log
+            promises.push(PipelineLog.create({
+                pipeline: id,
+                sessionId,
+                data: {
+                    type: 'error',
+                    error: e,
+                },
+                added_on: r.now(), // eslint-disable-line
+            }));
             // schedule exit
             logger.debug('[OUT] scheduling exit...');
             clean().forEach(p => promises.push(p));
             delayedExit({
                 status: 'error',
-                message: e.message
+                message: e.message || JSON.stringify(e)
             });
         }, () => {
             logger.debug('[OUT] pipeline done, scheduling exit');
