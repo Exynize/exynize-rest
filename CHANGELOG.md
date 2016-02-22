@@ -1,5 +1,11 @@
 # Changelog
 
+0.8.0 / 2016-02-22
+==================
+
+  * add configurable expiration time for all rabbitmq messages
+  * better error handling and reporting
+
 0.7.0 / 2016-02-16
 ==================
 
