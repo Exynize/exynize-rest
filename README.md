@@ -40,5 +40,5 @@ Alternatively, you can use Dockerfile to assemble docker container and then star
 
 ## License
 
-Dual licensed under LGPL-3.0 and commercial license.
+Dual licensed under GPL-3.0 and commercial license.
 See LICENSE.md file for more details.
