@@ -5,7 +5,6 @@ export const consoleTransport = new winston.transports.Console({
     prettyPrint: process.env.NODE_ENV !== 'production',
     colorize: process.env.NODE_ENV !== 'production',
     timestamp: process.env.NODE_ENV !== 'production',
-    logstash: process.env.NODE_ENV === 'production',
     label: 'rest-api',
 });
 
