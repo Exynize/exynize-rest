@@ -18,20 +18,44 @@ export default (ws) => {
             .subscribe(
                 execRes => {
                     logger.debug('exec result:', execRes);
+                    // if socket is not open, log and return
+                    if (ws.readyState !== 1) {
+                        logger.debug('[execute] socket is already closed!');
+                        return;
+                    }
+
                     ws.send(JSON.stringify(execRes));
                 },
                 error => {
                     logger.debug('exec error:', error);
+                    // if socket is not open, log and return
+                    if (ws.readyState !== 1) {
+                        logger.debug('[execute] socket is already closed!');
+                        return;
+                    }
+
                     ws.send(JSON.stringify({error}));
                     ws.close();
                 },
                 () => {
                     logger.debug('exec done!');
+                    // if socket is not open, log and return
+                    if (ws.readyState !== 1) {
+                        logger.debug('[execute] socket is already closed!');
+                        return;
+                    }
+
                     ws.close();
                 }
             );
         } catch (e) {
             logger.debug('subscribe error:', e);
+            // if socket is not open, log and return
+            if (ws.readyState !== 1) {
+                logger.debug('[execute] socket is already closed!');
+                return;
+            }
+
             if (e.message.indexOf('subscribe is not a function') !== -1) {
                 ws.send(JSON.stringify({error: 'Your function MUST return an Observable!'}));
             } else {

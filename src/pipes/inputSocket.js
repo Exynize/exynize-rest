@@ -10,6 +10,12 @@ export default async (ws, req) => {
     // get pipeline
     const pipeline = await Pipeline.getByUserAndRef(user, pipelineName);
     if (!pipeline) {
+        // if socket is not open, log and return
+        if (ws.readyState !== 1) {
+            logger.debug('socket is already closed!');
+            return;
+        }
+
         ws.send({error: 'pipeline not found'});
         ws.close();
         return;

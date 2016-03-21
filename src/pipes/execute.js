@@ -17,7 +17,7 @@ export default (ws) => {
         stream.subscribe(
             resp => {
                 // logger.debug('[execute] response:', resp);
-                // if socket is not open
+                // if socket is not open, log and return
                 if (ws.readyState !== 1) {
                     logger.debug('[execute] socket is already closed!');
                     return;
@@ -27,11 +27,23 @@ export default (ws) => {
             },
             error => {
                 logger.error('[execute] error:', error);
+                // if socket is not open, log and return
+                if (ws.readyState !== 1) {
+                    logger.debug('[execute] socket is already closed!');
+                    return;
+                }
+
                 ws.send(JSON.stringify({error}));
                 ws.close();
             },
             () => {
                 logger.debug('[execute] done!');
+                // if socket is not open, log and return
+                if (ws.readyState !== 1) {
+                    logger.debug('[execute] socket is already closed!');
+                    return;
+                }
+
                 ws.close();
             }
         );

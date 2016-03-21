@@ -13,6 +13,12 @@ export default (ws, req) => {
         try {
             cursor = await Pipeline.changes(id);
         } catch (e) {
+            // if socket is not open, log and return
+            if (ws.readyState !== 1) {
+                logger.debug('socket is already closed!');
+                return;
+            }
+
             ws.close();
             return;
         }
@@ -21,6 +27,12 @@ export default (ws, req) => {
         cursor.each((err, message) => {
             if (err) {
                 ws.close();
+                return;
+            }
+
+            // if socket is not open, log and return
+            if (ws.readyState !== 1) {
+                logger.debug('socket is already closed!');
                 return;
             }
 

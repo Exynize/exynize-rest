@@ -23,6 +23,12 @@ export default (ws, req) => {
                     throw new Error('Not authorized');
                 }
             } catch (e) {
+                // if socket is not open, log and return
+                if (ws.readyState !== 1) {
+                    logger.debug('socket is already closed!');
+                    return;
+                }
+
                 ws.send(JSON.stringify({error: e.message}));
                 ws.close();
                 return;
@@ -31,6 +37,12 @@ export default (ws, req) => {
         // if pipeline is not running, just send latest results from DB
         const pipelineLog = await PipelineLog.latest({pipeline: pipeline.id});
         const res = pipelineLog.map(it => it.data);
+        // if socket is not open, log and return
+        if (ws.readyState !== 1) {
+            logger.debug('socket is already closed!');
+            return;
+        }
+
         ws.send(JSON.stringify(res));
         // if pipeline is not running, just die
         if (pipeline.status !== 'running') {

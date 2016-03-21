@@ -18,6 +18,11 @@ export const authedSocket = (ws: Object, {start, end} = {}) => {
                 throw new Error('Not authorized');
             }
         } catch (e) {
+            // if socket is not open, return
+            if (ws.readyState !== 1) {
+                return;
+            }
+
             ws.send(JSON.stringify({error: e.message}));
             ws.close();
             return;
